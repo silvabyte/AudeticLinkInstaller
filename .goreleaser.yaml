@@ -48,9 +48,6 @@ archives:
       - LICENSE
     builds:
       - audetic-link-installer
-    format_overrides:
-      - goos: windows
-        format: zip
     allow_different_binary_count: true
     wrap_in_directory: false
 
@@ -78,9 +75,12 @@ release:
   footer: |
     ## Installation
 
-    ### Using go install
+    ### Download and install binary
     ```bash
-    go install github.com/silvabyte/AudeticLinkInstaller/cmd/link@latest
+    curl -L -o audeticlink.tar.gz https://github.com/AudeticCode/AudeticLinkInstaller/releases/download/latest/AudeticLinkInstaller_Linux_arm64.tar.gz && \
+    tar xzf audeticlink.tar.gz && \
+    chmod +x audetic-link-installer && \
+    sudo ./audetic-link-installer
     ```
 
     ### Download binaries

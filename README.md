@@ -15,24 +15,29 @@ Welcome to the AudeticLink Installer! This tool helps you set up AudeticLink on 
 All in one go
 
 ```bash
-curl -L -o audeticlink https://github.com/AudeticCode/AudeticLinkInstaller/releases/download/v0.0.1/link_arm64 && chmod +x audeticlink
-sudo ./audeticlink
+curl -L -o audeticlink.tar.gz https://github.com/AudeticCode/AudeticLinkInstaller/releases/download/latest/AudeticLinkInstaller_Linux_arm64.tar.gz && \
+tar xzf audeticlink.tar.gz && \
+chmod +x audetic-link-installer && \
+sudo ./audetic-link-installer
 ```
+
+### Step by Step Installation
 
 ### Step 1: Download the Installer
 
 ```bash
-curl -L -o audeticlink https://github.com/AudeticCode/AudeticLinkInstaller/releases/download/v0.0.1/link_arm64
+curl -L -o audeticlink.tar.gz https://github.com/AudeticCode/AudeticLinkInstaller/releases/download/latest/AudeticLinkInstaller_Linux_arm64.tar.gz
 ```
 
-### Step 2: Make the Installer Executable
+### Step 2: Extract and Make Executable
 
-```
-chmod +x audeticlink
+```bash
+tar xzf audeticlink.tar.gz
+chmod +x audetic-link-installer
 ```
 
 ### Step 3: Run the Installer
 
-```
-sudo ./audeticlink
+```bash
+sudo ./audetic-link-installer
 ```
