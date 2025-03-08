@@ -78,14 +78,10 @@ tag:
 		echo "Using next patch version: $$VERSION"; \
 		git tag -a "v$$VERSION" -m "Release v$$VERSION"; \
 		git push origin "v$$VERSION"; \
-		git tag -f latest; \
-		git push -f origin latest; \
 	else \
 		echo "Creating and pushing tag v$(VERSION)"; \
 		git tag -a "v$(VERSION)" -m "Release v$(VERSION)"; \
 		git push origin "v$(VERSION)"; \
-		git tag -f latest; \
-		git push -f origin latest; \
 	fi
 
 # Bump version targets
@@ -98,7 +94,7 @@ bump-minor:
 bump-major:
 	@$(MAKE) release VERSION=$(NEXT_MAJOR)
 
-# Create a new release using GoReleaser
+# Create a new release by creating a tag (CI will handle the release)
 release: clean
 	@if [ -z "$(VERSION)" ]; then \
 		export VERSION=$(NEXT_PATCH); \
@@ -108,7 +104,7 @@ release: clean
 			exit 1; \
 		fi; \
 		$(MAKE) tag VERSION=$$VERSION; \
-		goreleaser release --clean; \
+		echo "Tag v$$VERSION created and pushed. CI will handle the release."; \
 	else \
 		echo "Creating release v$(VERSION)"; \
 		if [ -n "$$(git status --porcelain)" ]; then \
@@ -116,7 +112,7 @@ release: clean
 			exit 1; \
 		fi; \
 		$(MAKE) tag VERSION=$(VERSION); \
-		goreleaser release --clean; \
+		echo "Tag v$(VERSION) created and pushed. CI will handle the release."; \
 	fi
 
 # Test release without publishing
