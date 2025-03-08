@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/silvabyte/audeticlinkinstaller/internal/ascii"
 	"github.com/silvabyte/audeticlinkinstaller/internal/audio"
 	"github.com/silvabyte/audeticlinkinstaller/internal/config"
 	"github.com/silvabyte/audeticlinkinstaller/internal/pin"
@@ -23,6 +24,9 @@ func InstallRPi(cfg *types.RPiConfig) error {
 	if !cfg.DryRun && os.Geteuid() != 0 {
 		return fmt.Errorf("this installer must be run as root for actual installation")
 	}
+
+	ascii.Logo()
+	fmt.Println("Welcome to the Audetic Link installer for Raspberry Pi!")
 
 	// Initialize progress spinner
 	cfg.Progress = pin.New("Starting installation...",

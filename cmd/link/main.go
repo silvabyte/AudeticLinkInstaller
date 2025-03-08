@@ -12,7 +12,7 @@ var cli = link.LinkInstaller{}
 
 func main() {
 	ctx := kong.Parse(&cli,
-		kong.Name("link"),
+		kong.Name("audeticlink"),
 		kong.Description("Audetic Link device management tool"),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
