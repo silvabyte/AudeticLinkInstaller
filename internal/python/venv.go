@@ -50,14 +50,3 @@ func SetupVenv(cfg *types.RPiConfig) error {
 
 	return nil
 }
-
-func joinArgs(args []string) string {
-	result := ""
-	for i, arg := range args {
-		if i > 0 {
-			result += " "
-		}
-		result += arg
-	}
-	return result
-}

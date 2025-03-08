@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 
 	"github.com/silvabyte/audeticlinkinstaller/internal/types"
@@ -23,12 +22,12 @@ func SetupEnv(cfg *types.RPiConfig) error {
 		return fmt.Errorf("failed to write .env file: %w", err)
 	}
 
-	currentUser, err := user.Current()
+	realUser, err := user_utils.GetRealUser()
 	if err != nil {
-		return fmt.Errorf("failed to get current user: %w", err)
+		return fmt.Errorf("failed to get real user: %w", err)
 	}
 
-	uid, err := user_utils.UIdToInt(currentUser.Uid)
+	uid, err := user_utils.UIdToInt(realUser.Uid)
 	if err != nil {
 		return fmt.Errorf("failed to convert uid to int: %w", err)
 	}

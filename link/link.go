@@ -2,11 +2,11 @@ package link
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/fatih/color"
 	"github.com/silvabyte/audeticlinkinstaller/internal/installer"
 	"github.com/silvabyte/audeticlinkinstaller/internal/types"
+	"github.com/silvabyte/audeticlinkinstaller/internal/user_utils"
 )
 
 type InstallCmd struct {
@@ -23,9 +23,10 @@ func InstallRPi02W(cmd *LinkInstaller) error {
 	info := color.New(color.FgCyan).PrintlnFunc()
 	info("Installing Audetic Link for Raspberry Pi Zero 2 W...")
 
-	home, err := os.UserHomeDir()
+	// Get the real user's home directory
+	home, err := user_utils.GetRealUserHome()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get user home directory: %w", err)
 	}
 
 	cfg := &types.RPiConfig{

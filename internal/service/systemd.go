@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"os/user"
 
 	"github.com/silvabyte/audeticlinkinstaller/internal/types"
+	"github.com/silvabyte/audeticlinkinstaller/internal/user_utils"
 )
 
 func createServiceFileContents(appDir string) (string, error) {
-	currentUser, err := user.Current()
+	realUser, err := user_utils.GetRealUser()
 	if err != nil {
-		return "", fmt.Errorf("failed to get current user: %w", err)
+		return "", fmt.Errorf("failed to get real user: %w", err)
 	}
 
 	serviceTemplate := `[Unit]
@@ -33,7 +33,7 @@ PIDFile=/run/audetic-link.pid
 [Install]
 WantedBy=multi-user.target`
 
-	return fmt.Sprintf(serviceTemplate, currentUser.Username, appDir, appDir, appDir), nil
+	return fmt.Sprintf(serviceTemplate, realUser.Username, appDir, appDir, appDir), nil
 }
 
 // Setup installs and starts the systemd service
@@ -48,6 +48,27 @@ func Setup(cfg *types.RPiConfig) error {
 	dst := "/etc/systemd/system/audetic_link.service"
 	if err := os.WriteFile(dst, []byte(contents), 0644); err != nil {
 		return fmt.Errorf("failed to write service file: %w", err)
+	}
+
+	// Set proper ownership of application directory
+	realUser, err := user_utils.GetRealUser()
+	if err != nil {
+		return fmt.Errorf("failed to get real user: %w", err)
+	}
+
+	uid, err := user_utils.UIdToInt(realUser.Uid)
+	if err != nil {
+		return fmt.Errorf("failed to convert uid to int: %w", err)
+	}
+
+	cfg.Progress.UpdateMessage("Setting directory permissions...")
+	if err := os.Chown(cfg.AppDir, uid, -1); err != nil {
+		return fmt.Errorf("failed to set app directory ownership: %w", err)
+	}
+
+	// Recursively set ownership of all files
+	if err := exec.Command("chown", "-R", fmt.Sprintf("%s:", realUser.Username), cfg.AppDir).Run(); err != nil {
+		return fmt.Errorf("failed to set recursive ownership: %w", err)
 	}
 
 	// Reload systemd
@@ -72,6 +93,11 @@ func Setup(cfg *types.RPiConfig) error {
 
 // SetupRemoteAccess configures rpi-connect and user lingering
 func SetupRemoteAccess(cfg *types.RPiConfig) error {
+	realUser, err := user_utils.GetRealUser()
+	if err != nil {
+		return fmt.Errorf("failed to get real user: %w", err)
+	}
+
 	// Enable and start rpi-connect
 	cfg.Progress.UpdateMessage("Enabling rpi-connect...")
 	if err := exec.Command("systemctl", "enable", "rpi-connect").Run(); err != nil {
@@ -85,7 +111,7 @@ func SetupRemoteAccess(cfg *types.RPiConfig) error {
 
 	// Enable user lingering
 	cfg.Progress.UpdateMessage("Enabling user lingering...")
-	if err := exec.Command("loginctl", "enable-linger", "audetic").Run(); err != nil {
+	if err := exec.Command("loginctl", "enable-linger", realUser.Username).Run(); err != nil {
 		return fmt.Errorf("failed to enable user lingering: %w", err)
 	}
 
