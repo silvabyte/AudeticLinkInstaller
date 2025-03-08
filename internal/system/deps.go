@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/silvabyte/audeticlinkinstaller/internal/types"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
 )
 
 // InstallDependencies installs all required system packages

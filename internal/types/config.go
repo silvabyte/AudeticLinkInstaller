@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/silvabyte/audeticlinkinstaller/internal/pin"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/pin"
 )
 
 // RPiConfig holds configuration for Raspberry Pi installation

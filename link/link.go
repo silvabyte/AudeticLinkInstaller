@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/silvabyte/audeticlinkinstaller/internal/installer"
-	"github.com/silvabyte/audeticlinkinstaller/internal/types"
-	"github.com/silvabyte/audeticlinkinstaller/internal/user_utils"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/installer"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/user_utils"
 )
 
 type InstallCmd struct {

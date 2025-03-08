@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/silvabyte/audeticlinkinstaller/internal/types"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
 )
 
 const alsaConfig = `pcm.i2s_mic {

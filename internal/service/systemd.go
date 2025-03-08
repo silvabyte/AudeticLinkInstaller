@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/silvabyte/audeticlinkinstaller/internal/types"
-	"github.com/silvabyte/audeticlinkinstaller/internal/user_utils"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/user_utils"
 )
 
 func createServiceFileContents(appDir string) (string, error) {

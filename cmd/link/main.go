@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
-	"github.com/silvabyte/audeticlinkinstaller/link"
+	"github.com/silvabyte/AudeticLinkInstaller/link"
 )
 
 var cli = link.LinkInstaller{}

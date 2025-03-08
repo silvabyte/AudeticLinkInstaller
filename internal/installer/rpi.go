@@ -7,15 +7,15 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/silvabyte/audeticlinkinstaller/internal/ascii"
-	"github.com/silvabyte/audeticlinkinstaller/internal/audio"
-	"github.com/silvabyte/audeticlinkinstaller/internal/config"
-	"github.com/silvabyte/audeticlinkinstaller/internal/pin"
-	"github.com/silvabyte/audeticlinkinstaller/internal/python"
-	"github.com/silvabyte/audeticlinkinstaller/internal/repo"
-	"github.com/silvabyte/audeticlinkinstaller/internal/service"
-	"github.com/silvabyte/audeticlinkinstaller/internal/system"
-	"github.com/silvabyte/audeticlinkinstaller/internal/types"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/ascii"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/audio"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/config"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/pin"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/python"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/repo"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/service"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/system"
+	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
 )
 
 // InstallRPi performs the complete installation for Raspberry Pi
