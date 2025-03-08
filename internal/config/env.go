@@ -5,12 +5,12 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+
+	"github.com/silvabyte/audeticlinkinstaller/internal/user_utils"
 )
 
 const envTemplate = `APP_DIR=%s
-AUDETIC_API_URL=https://app.audetic.ai
-LINK_CLIENT_ID=
-LINK_CLIENT_SECRET=`
+AUDETIC_API_URL=https://app.audetic.ai`
 
 // SetupEnv creates and configures the .env file
 func SetupEnv(appDir string) error {
@@ -21,23 +21,20 @@ func SetupEnv(appDir string) error {
 		return fmt.Errorf("failed to write .env file: %w", err)
 	}
 
+	currentUser, err := user.Current()
+	if err != nil {
+		return fmt.Errorf("failed to get current user: %w", err)
+	}
+
+	uid, err := user_utils.UIdToInt(currentUser.Uid)
+	if err != nil {
+		return fmt.Errorf("failed to convert uid to int: %w", err)
+	}
+
 	// Set ownership
-	uid := getUserID("audetic")
-	if uid != -1 {
-		if err := os.Chown(envPath, uid, -1); err != nil {
-			return fmt.Errorf("failed to set .env ownership: %w", err)
-		}
+	if err := os.Chown(envPath, uid, -1); err != nil {
+		return fmt.Errorf("failed to set .env ownership: %w", err)
 	}
 
 	return nil
-}
-
-func getUserID(username string) int {
-	u, err := user.Lookup(username)
-	if err != nil {
-		return -1
-	}
-	uid := -1
-	fmt.Sscanf(u.Uid, "%d", &uid)
-	return uid
 }

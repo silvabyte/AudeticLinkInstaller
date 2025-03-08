@@ -7,9 +7,9 @@ import (
 	"github.com/silvabyte/audeticlinkinstaller/internal/audio"
 	"github.com/silvabyte/audeticlinkinstaller/internal/config"
 	"github.com/silvabyte/audeticlinkinstaller/internal/python"
+	"github.com/silvabyte/audeticlinkinstaller/internal/repo"
 	"github.com/silvabyte/audeticlinkinstaller/internal/service"
 	"github.com/silvabyte/audeticlinkinstaller/internal/system"
-	"github.com/silvabyte/audeticlinkinstaller/internal/user"
 )
 
 // RPiConfig holds configuration for Raspberry Pi installation
@@ -37,7 +37,7 @@ func InstallRPi(cfg RPiConfig) error {
 		{"Configuring audio", func() error { return audio.Configure(cfg.ConfigPath) }},
 		// {"Setting up user", user.Setup},
 		{"Setting up application", func() error {
-			return user.SetupApp(cfg.AppDir, fmt.Sprintf("https://%s:%s@github.com/%s/%s.git", cfg.RepoUser, cfg.RepoToken, cfg.RepoOrg, cfg.RepoName))
+			return repo.SetupApp(cfg.AppDir, fmt.Sprintf("https://%s:%s@github.com/%s/%s.git", cfg.RepoUser, cfg.RepoToken, cfg.RepoOrg, cfg.RepoName))
 		}},
 		{"Setting up Python environment", func() error { return python.SetupVenv(cfg.AppDir) }},
 		{"Setting up environment variables", func() error { return config.SetupEnv(cfg.AppDir) }},
