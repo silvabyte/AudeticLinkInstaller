@@ -23,7 +23,7 @@ func SetupVenv(cfg *types.RPiConfig) error {
 
 	// Install packages
 	packages := []string{
-		"--upgrade", "pip",
+		"pip",
 		"uv",
 		"uvicorn",
 		"gunicorn",

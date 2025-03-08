@@ -12,6 +12,7 @@ import (
 type InstallCmd struct {
 	Device string `arg:"" help:"Device type to install (rpi02w)" enum:"rpi02w"`
 	DryRun bool   `help:"Simulate installation without making any changes" default:"false"`
+	Debug  bool   `help:"Enable debug mode" default:"false"`
 }
 
 type LinkInstaller struct {

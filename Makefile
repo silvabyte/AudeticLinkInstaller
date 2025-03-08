@@ -16,9 +16,9 @@ OUT_DIR=out
 
 # Version management
 CURRENT_VERSION=$(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-NEXT_PATCH=$(shell echo $(CURRENT_VERSION) | awk -F. '{ printf("v%d.%d.%d", $$1, $$2, $$3+1) }' | sed 's/v\([0-9]\)/\1/')
-NEXT_MINOR=$(shell echo $(CURRENT_VERSION) | awk -F. '{ printf("v%d.%d.%d", $$1, $$2+1, 0) }' | sed 's/v\([0-9]\)/\1/')
-NEXT_MAJOR=$(shell echo $(CURRENT_VERSION) | awk -F. '{ printf("v%d.%d.%d", $$1+1, 0, 0) }' | sed 's/v\([0-9]\)/\1/')
+NEXT_PATCH=$(shell if [ "$(CURRENT_VERSION)" = "v0.0.0" ]; then echo "0.0.1"; else echo $(CURRENT_VERSION) | awk -F. '{ printf("%d.%d.%d", substr($$1,2), $$2, $$3+1) }'; fi)
+NEXT_MINOR=$(shell if [ "$(CURRENT_VERSION)" = "v0.0.0" ]; then echo "0.1.0"; else echo $(CURRENT_VERSION) | awk -F. '{ printf("%d.%d.%d", substr($$1,2), $$2+1, 0) }'; fi)
+NEXT_MAJOR=$(shell if [ "$(CURRENT_VERSION)" = "v0.0.0" ]; then echo "1.0.0"; else echo $(CURRENT_VERSION) | awk -F. '{ printf("%d.%d.%d", substr($$1,2)+1, 0, 0) }'; fi)
 
 # Run all
 all: test build
@@ -74,35 +74,35 @@ get-version:
 # Create and push a new tag
 tag:
 	@if [ -z "$(VERSION)" ]; then \
-		echo "No version specified, using next patch version: $(NEXT_PATCH)"; \
-		VERSION=$(NEXT_PATCH); \
+		echo "Using next patch version: $(NEXT_PATCH)"; \
+		$(eval VERSION=$(NEXT_PATCH)); \
 	fi
 	@echo "Creating and pushing tag v$(VERSION)"
-	git tag -a v$(VERSION) -m "Release v$(VERSION)"
-	git push origin v$(VERSION)
+	git tag -a "v$(VERSION)" -m "Release v$(VERSION)"
+	git push origin "v$(VERSION)"
 
 # Bump version targets
-bump-patch: VERSION=$(NEXT_PATCH)
-bump-patch: release
+bump-patch:
+	@$(MAKE) release VERSION=$(NEXT_PATCH)
 
-bump-minor: VERSION=$(NEXT_MINOR)
-bump-minor: release
+bump-minor:
+	@$(MAKE) release VERSION=$(NEXT_MINOR)
 
-bump-major: VERSION=$(NEXT_MAJOR)
-bump-major: release
+bump-major:
+	@$(MAKE) release VERSION=$(NEXT_MAJOR)
 
 # Create a new release using GoReleaser
 release: clean
 	@if [ -z "$(VERSION)" ]; then \
-		echo "No version specified, using next patch version: $(NEXT_PATCH)"; \
-		VERSION=$(NEXT_PATCH); \
+		echo "Using next patch version: $(NEXT_PATCH)"; \
+		$(eval VERSION=$(NEXT_PATCH)); \
 	fi
 	@echo "Creating release v$(VERSION)"
 	@if [ -n "$$(git status --porcelain)" ]; then \
 		echo "Error: Working directory is not clean. Please commit or stash changes first."; \
 		exit 1; \
 	fi
-	make tag VERSION=$(VERSION)
+	@$(MAKE) tag VERSION=$(VERSION)
 	goreleaser release --clean
 
 # Test release without publishing
