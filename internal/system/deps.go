@@ -3,10 +3,12 @@ package system
 import (
 	"fmt"
 	"os/exec"
+
+	"github.com/silvabyte/audeticlinkinstaller/internal/types"
 )
 
 // InstallDependencies installs all required system packages
-func InstallDependencies() error {
+func InstallDependencies(cfg *types.RPiConfig) error {
 	deps := []string{
 		"git",
 		"python3-pip",
@@ -22,19 +24,23 @@ func InstallDependencies() error {
 	}
 
 	// Update package list
+	cfg.Progress.UpdateMessage("Updating package list...")
 	if err := execCommand("apt", "update"); err != nil {
 		return fmt.Errorf("failed to update package list: %w", err)
 	}
 
 	// Upgrade system
+	cfg.Progress.UpdateMessage("Upgrading system packages...")
 	if err := execCommand("apt", "full-upgrade", "-y"); err != nil {
 		return fmt.Errorf("failed to upgrade system: %w", err)
 	}
 
 	// Install packages
-	args := append([]string{"install", "-y"}, deps...)
-	if err := execCommand("apt", args...); err != nil {
-		return fmt.Errorf("failed to install dependencies: %w", err)
+	for _, dep := range deps {
+		cfg.Progress.UpdateMessage(fmt.Sprintf("Installing %s...", dep))
+		if err := execCommand("apt", "install", "-y", dep); err != nil {
+			return fmt.Errorf("failed to install %s: %w", dep, err)
+		}
 	}
 
 	return nil

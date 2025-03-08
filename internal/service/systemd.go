@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+
+	"github.com/silvabyte/audeticlinkinstaller/internal/types"
 )
 
 func createServiceFileContents(appDir string) (string, error) {
@@ -35,9 +37,10 @@ WantedBy=multi-user.target`
 }
 
 // Setup installs and starts the systemd service
-func Setup(appDir string) error {
+func Setup(cfg *types.RPiConfig) error {
 	// Copy service file
-	contents, err := createServiceFileContents(appDir)
+	cfg.Progress.UpdateMessage("Creating service file...")
+	contents, err := createServiceFileContents(cfg.AppDir)
 	if err != nil {
 		return fmt.Errorf("failed to create service file contents: %w", err)
 	}
@@ -48,15 +51,18 @@ func Setup(appDir string) error {
 	}
 
 	// Reload systemd
+	cfg.Progress.UpdateMessage("Reloading systemd...")
 	if err := exec.Command("systemctl", "daemon-reload").Run(); err != nil {
 		return fmt.Errorf("failed to reload systemd: %w", err)
 	}
 
 	// Enable and start service
+	cfg.Progress.UpdateMessage("Enabling service...")
 	if err := exec.Command("systemctl", "enable", "audetic_link.service").Run(); err != nil {
 		return fmt.Errorf("failed to enable service: %w", err)
 	}
 
+	cfg.Progress.UpdateMessage("Starting service...")
 	if err := exec.Command("systemctl", "start", "audetic_link.service").Run(); err != nil {
 		return fmt.Errorf("failed to start service: %w", err)
 	}
@@ -65,17 +71,20 @@ func Setup(appDir string) error {
 }
 
 // SetupRemoteAccess configures rpi-connect and user lingering
-func SetupRemoteAccess() error {
+func SetupRemoteAccess(cfg *types.RPiConfig) error {
 	// Enable and start rpi-connect
+	cfg.Progress.UpdateMessage("Enabling rpi-connect...")
 	if err := exec.Command("systemctl", "enable", "rpi-connect").Run(); err != nil {
 		return fmt.Errorf("failed to enable rpi-connect: %w", err)
 	}
 
+	cfg.Progress.UpdateMessage("Starting rpi-connect...")
 	if err := exec.Command("systemctl", "start", "rpi-connect").Run(); err != nil {
 		return fmt.Errorf("failed to start rpi-connect: %w", err)
 	}
 
 	// Enable user lingering
+	cfg.Progress.UpdateMessage("Enabling user lingering...")
 	if err := exec.Command("loginctl", "enable-linger", "audetic").Run(); err != nil {
 		return fmt.Errorf("failed to enable user lingering: %w", err)
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/silvabyte/audeticlinkinstaller/internal/installer"
+	"github.com/silvabyte/audeticlinkinstaller/internal/types"
 )
 
 type InstallCmd struct {
@@ -18,7 +19,7 @@ type LinkInstaller struct {
 }
 
 // InstallRPi02W installs Audetic Link for Raspberry Pi Zero 2 W
-func InstallRPi02W(cmd LinkInstaller) error {
+func InstallRPi02W(cmd *LinkInstaller) error {
 	info := color.New(color.FgCyan).PrintlnFunc()
 	info("Installing Audetic Link for Raspberry Pi Zero 2 W...")
 
@@ -27,7 +28,7 @@ func InstallRPi02W(cmd LinkInstaller) error {
 		return err
 	}
 
-	cfg := installer.RPiConfig{
+	cfg := &types.RPiConfig{
 		ConfigPath: "/boot/firmware/config.txt",
 		AppDir:     fmt.Sprintf("%s/AudeticLink", home),
 		RepoUser:   "matsilva",
@@ -52,7 +53,7 @@ func InstallRPiPico() error {
 }
 
 // Run executes the installer for the specified device
-func (cmd LinkInstaller) Run() error {
+func (cmd *LinkInstaller) Run() error {
 	switch cmd.Install.Device {
 	case "rpi02w":
 		return InstallRPi02W(cmd)
