@@ -23,10 +23,10 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      - windows
-      - darwin
+      # - windows
+      # - darwin
     goarch:
-      - amd64
+      # - amd64
       - arm64
     ldflags:
       - -s -w
@@ -46,13 +46,13 @@ archives:
     files:
       - README.md
       - LICENSE
-    format: tar.gz
+    builds:
+      - audetic-link-installer
     format_overrides:
       - goos: windows
         format: zip
-    builds:
-      - audetic-link-installer
     allow_different_binary_count: true
+    wrap_in_directory: false
 
 checksum:
   name_template: 'checksums.txt'

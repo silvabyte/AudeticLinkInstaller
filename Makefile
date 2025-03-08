@@ -74,12 +74,15 @@ get-version:
 # Create and push a new tag
 tag:
 	@if [ -z "$(VERSION)" ]; then \
-		echo "Using next patch version: $(NEXT_PATCH)"; \
-		$(eval VERSION=$(NEXT_PATCH)); \
+		export VERSION=$(NEXT_PATCH); \
+		echo "Using next patch version: $$VERSION"; \
+		git tag -a "v$$VERSION" -m "Release v$$VERSION"; \
+		git push origin "v$$VERSION"; \
+	else \
+		echo "Creating and pushing tag v$(VERSION)"; \
+		git tag -a "v$(VERSION)" -m "Release v$(VERSION)"; \
+		git push origin "v$(VERSION)"; \
 	fi
-	@echo "Creating and pushing tag v$(VERSION)"
-	git tag -a "v$(VERSION)" -m "Release v$(VERSION)"
-	git push origin "v$(VERSION)"
 
 # Bump version targets
 bump-patch:
@@ -94,16 +97,23 @@ bump-major:
 # Create a new release using GoReleaser
 release: clean
 	@if [ -z "$(VERSION)" ]; then \
-		echo "Using next patch version: $(NEXT_PATCH)"; \
-		$(eval VERSION=$(NEXT_PATCH)); \
+		export VERSION=$(NEXT_PATCH); \
+		echo "Using next patch version: $$VERSION"; \
+		if [ -n "$$(git status --porcelain)" ]; then \
+			echo "Error: Working directory is not clean. Please commit or stash changes first."; \
+			exit 1; \
+		fi; \
+		$(MAKE) tag VERSION=$$VERSION; \
+		goreleaser release --clean; \
+	else \
+		echo "Creating release v$(VERSION)"; \
+		if [ -n "$$(git status --porcelain)" ]; then \
+			echo "Error: Working directory is not clean. Please commit or stash changes first."; \
+			exit 1; \
+		fi; \
+		$(MAKE) tag VERSION=$(VERSION); \
+		goreleaser release --clean; \
 	fi
-	@echo "Creating release v$(VERSION)"
-	@if [ -n "$$(git status --porcelain)" ]; then \
-		echo "Error: Working directory is not clean. Please commit or stash changes first."; \
-		exit 1; \
-	fi
-	@$(MAKE) tag VERSION=$(VERSION)
-	goreleaser release --clean
 
 # Test release without publishing
 release-dry-run: clean
