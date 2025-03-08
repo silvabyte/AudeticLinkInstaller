@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -108,19 +109,46 @@ func SetupRemoteAccess(cfg *types.RPiConfig) error {
 
 	// Enable and start rpi-connect
 	cfg.Progress.UpdateMessage("Enabling rpi-connect...")
-	if err := exec.Command("systemctl", "enable", "rpi-connect").Run(); err != nil {
-		return fmt.Errorf("failed to enable rpi-connect: %w", err)
+	cmd := exec.Command("systemctl", "enable", "rpi-connect")
+	if cfg.Debug {
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to enable rpi-connect: %w\nError output: %s", err, stderr.String())
+		}
+	} else {
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to enable rpi-connect: %w", err)
+		}
 	}
 
 	cfg.Progress.UpdateMessage("Starting rpi-connect...")
-	if err := exec.Command("systemctl", "start", "rpi-connect").Run(); err != nil {
-		return fmt.Errorf("failed to start rpi-connect: %w", err)
+	cmd = exec.Command("systemctl", "start", "rpi-connect")
+	if cfg.Debug {
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to start rpi-connect: %w\nError output: %s", err, stderr.String())
+		}
+	} else {
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to start rpi-connect: %w", err)
+		}
 	}
 
 	// Enable user lingering
 	cfg.Progress.UpdateMessage("Enabling user lingering...")
-	if err := exec.Command("loginctl", "enable-linger", realUser.Username).Run(); err != nil {
-		return fmt.Errorf("failed to enable user lingering: %w", err)
+	cmd = exec.Command("loginctl", "enable-linger", realUser.Username)
+	if cfg.Debug {
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to enable user lingering: %w\nError output: %s", err, stderr.String())
+		}
+	} else {
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to enable user lingering: %w", err)
+		}
 	}
 
 	return nil

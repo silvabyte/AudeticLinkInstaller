@@ -1,6 +1,7 @@
 package python
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 
@@ -17,8 +18,17 @@ func SetupVenv(cfg *types.RPiConfig) error {
 	cfg.Progress.UpdateMessage("Creating Python virtual environment...")
 	cmd := exec.Command("python3", "-m", "venv", ".venv")
 	cmd.Dir = cfg.AppDir
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to create virtual environment: %w", err)
+
+	if cfg.Debug {
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to create virtual environment: %w\nError output: %s", err, stderr.String())
+		}
+	} else {
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to create virtual environment: %w", err)
+		}
 	}
 
 	// Install packages
@@ -38,8 +48,17 @@ func SetupVenv(cfg *types.RPiConfig) error {
 		args := fmt.Sprintf("source %s/.venv/bin/activate && pip install %s", cfg.AppDir, pkg)
 		cmd = exec.Command("bash", "-c", args)
 		cmd.Dir = cfg.AppDir
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to install Python package %s: %w", pkg, err)
+
+		if cfg.Debug {
+			var stderr bytes.Buffer
+			cmd.Stderr = &stderr
+			if err := cmd.Run(); err != nil {
+				return fmt.Errorf("failed to install Python package %s: %w\nError output: %s", pkg, err, stderr.String())
+			}
+		} else {
+			if err := cmd.Run(); err != nil {
+				return fmt.Errorf("failed to install Python package %s: %w", pkg, err)
+			}
 		}
 	}
 
@@ -48,8 +67,17 @@ func SetupVenv(cfg *types.RPiConfig) error {
 	args := fmt.Sprintf("source %s/.venv/bin/activate && uv sync", cfg.AppDir)
 	cmd = exec.Command("bash", "-c", args)
 	cmd.Dir = cfg.AppDir
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to sync Python packages: %w", err)
+
+	if cfg.Debug {
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to sync Python packages: %w\nError output: %s", err, stderr.String())
+		}
+	} else {
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to sync Python packages: %w", err)
+		}
 	}
 
 	return nil

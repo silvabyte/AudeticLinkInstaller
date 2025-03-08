@@ -43,6 +43,7 @@ func InstallRPi02W(cmd *LinkInstaller) error {
 		RepoOrg:    "silvabyte",
 		RepoName:   "AudeticLink",
 		DryRun:     cmd.Install.DryRun,
+		Debug:      cmd.Install.Debug,
 	}
 
 	if err := installer.InstallRPi(cfg); err != nil {
