@@ -11,6 +11,7 @@ import (
 
 type InstallCmd struct {
 	Device string `arg:"" help:"Device type to install (rpi02w)" enum:"rpi02w"`
+	DryRun bool   `help:"Simulate installation without making any changes" default:"false"`
 }
 
 type LinkInstaller struct {
@@ -21,7 +22,11 @@ type LinkInstaller struct {
 // InstallRPi02W installs Audetic Link for Raspberry Pi Zero 2 W
 func InstallRPi02W(cmd *LinkInstaller) error {
 	info := color.New(color.FgCyan).PrintlnFunc()
-	info("Installing Audetic Link for Raspberry Pi Zero 2 W...")
+	if cmd.Install.DryRun {
+		info("Simulating installation of Audetic Link for Raspberry Pi Zero 2 W...")
+	} else {
+		info("Installing Audetic Link for Raspberry Pi Zero 2 W...")
+	}
 
 	// Get the real user's home directory
 	home, err := user_utils.GetRealUserHome()
@@ -36,6 +41,7 @@ func InstallRPi02W(cmd *LinkInstaller) error {
 		RepoToken:  cmd.GithubToken,
 		RepoOrg:    "silvabyte",
 		RepoName:   "AudeticLink",
+		DryRun:     cmd.Install.DryRun,
 	}
 
 	if err := installer.InstallRPi(cfg); err != nil {

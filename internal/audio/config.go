@@ -22,6 +22,10 @@ pcm.!default {
 
 // Configure sets up I2S audio on the Raspberry Pi
 func Configure(cfg *types.RPiConfig) error {
+	if cfg.DryRun {
+		return nil
+	}
+
 	// Enable I2S in config.txt
 	cfg.Progress.UpdateMessage("Enabling I2S in config.txt...")
 	if err := appendIfNotExists(cfg.ConfigPath, "dtparam=i2s=on"); err != nil {

@@ -38,6 +38,10 @@ WantedBy=multi-user.target`
 
 // Setup installs and starts the systemd service
 func Setup(cfg *types.RPiConfig) error {
+	if cfg.DryRun {
+		return nil
+	}
+
 	// Copy service file
 	cfg.Progress.UpdateMessage("Creating service file...")
 	contents, err := createServiceFileContents(cfg.AppDir)
@@ -93,6 +97,10 @@ func Setup(cfg *types.RPiConfig) error {
 
 // SetupRemoteAccess configures rpi-connect and user lingering
 func SetupRemoteAccess(cfg *types.RPiConfig) error {
+	if cfg.DryRun {
+		return nil
+	}
+
 	realUser, err := user_utils.GetRealUser()
 	if err != nil {
 		return fmt.Errorf("failed to get real user: %w", err)

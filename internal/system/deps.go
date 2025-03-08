@@ -23,6 +23,10 @@ func InstallDependencies(cfg *types.RPiConfig) error {
 		"alsa-utils",
 	}
 
+	if cfg.DryRun {
+		return nil
+	}
+
 	// Update package list
 	cfg.Progress.UpdateMessage("Updating package list...")
 	if err := execCommand("apt", "update"); err != nil {

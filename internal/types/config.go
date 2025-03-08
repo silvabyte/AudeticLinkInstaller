@@ -13,4 +13,5 @@ type RPiConfig struct {
 	RepoOrg    string
 	RepoName   string
 	Progress   *pin.Pin
+	DryRun     bool
 }

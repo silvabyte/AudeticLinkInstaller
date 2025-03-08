@@ -14,6 +14,10 @@ AUDETIC_API_URL=https://app.audetic.ai`
 
 // SetupEnv creates and configures the .env file
 func SetupEnv(cfg *types.RPiConfig) error {
+	if cfg.DryRun {
+		return nil
+	}
+
 	cfg.Progress.UpdateMessage("Creating .env file...")
 	envPath := filepath.Join(cfg.AppDir, ".env")
 	content := fmt.Sprintf(envTemplate, cfg.AppDir)

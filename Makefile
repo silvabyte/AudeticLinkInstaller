@@ -1,4 +1,4 @@
-.PHONY: all test build clean run deps build-linux release
+.PHONY: all test build clean run deps build-linux release dry-run
 
 # Go parameters
 GOCMD=go
@@ -65,3 +65,8 @@ release: build-arm64
 		$(OUT_DIR)/$(BINARY_ARM64) \
 		--title "Release $(VERSION)" \
 		--generate-notes
+
+# Run dry-run simulation for local development
+dry-run: build
+	@echo "Running dry-run simulation for local development..."
+	@GITHUB_TOKEN="dummy_token" ./$(OUT_DIR)/$(BINARY_NAME) install --dry-run rpi02w

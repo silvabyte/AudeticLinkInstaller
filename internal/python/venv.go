@@ -9,6 +9,10 @@ import (
 
 // SetupVenv creates and configures the Python virtual environment
 func SetupVenv(cfg *types.RPiConfig) error {
+	if cfg.DryRun {
+		return nil
+	}
+
 	// Create virtual environment
 	cfg.Progress.UpdateMessage("Creating Python virtual environment...")
 	cmd := exec.Command("python3", "-m", "venv", ".venv")

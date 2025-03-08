@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/silvabyte/audeticlinkinstaller/internal/audio"
 	"github.com/silvabyte/audeticlinkinstaller/internal/config"
 	"github.com/silvabyte/audeticlinkinstaller/internal/pin"
@@ -18,9 +19,9 @@ import (
 
 // InstallRPi performs the complete installation for Raspberry Pi
 func InstallRPi(cfg *types.RPiConfig) error {
-	// Check root
-	if os.Geteuid() != 0 {
-		return fmt.Errorf("this installer must be run as root")
+	// Check root only for actual installation
+	if !cfg.DryRun && os.Geteuid() != 0 {
+		return fmt.Errorf("this installer must be run as root for actual installation")
 	}
 
 	// Initialize progress spinner
@@ -29,6 +30,36 @@ func InstallRPi(cfg *types.RPiConfig) error {
 		pin.WithTextColor(pin.ColorWhite))
 	cancel := cfg.Progress.Start(context.Background())
 	defer cancel()
+
+	info := color.New(color.FgYellow).PrintlnFunc()
+	if cfg.DryRun {
+		info("\nDRY RUN: The following changes would be made:")
+		info("-------------------------------------------")
+		info(fmt.Sprintf("• Application directory: %s", cfg.AppDir))
+		info(fmt.Sprintf("• Configuration file: %s", cfg.ConfigPath))
+		info("• Service file: /etc/systemd/system/audetic_link.service")
+		info("• System packages to be installed:")
+		info("  - git")
+		info("  - python3-pip")
+		info("  - python3-venv")
+		info("  - python3-gpiozero")
+		info("  - sox")
+		info("  - libsox-fmt-all")
+		info("  - netcat-openbsd")
+		info("  - rpi-connect-lite")
+		info("  - i2c-tools")
+		info("  - python3-smbus")
+		info("  - alsa-utils")
+		info("\nConfiguration changes:")
+		info(fmt.Sprintf("• I2S will be enabled in %s", cfg.ConfigPath))
+		info("• ALSA configuration will be written to /etc/asound.conf")
+		info(fmt.Sprintf("• Python virtual environment will be created in %s/.venv", cfg.AppDir))
+		info(fmt.Sprintf("• Environment file will be created at %s/.env", cfg.AppDir))
+		info("• Systemd service 'audetic_link' will be created and enabled")
+		info("• Remote access service 'rpi-connect' will be enabled")
+		info("\nNo changes have been made. Run without --dry-run to perform the installation.")
+		return nil
+	}
 
 	// Step 1: Install system dependencies
 	cfg.Progress.UpdateMessage("Installing system dependencies...")
