@@ -35,7 +35,6 @@ func InstallRPi(cfg RPiConfig) error {
 	}{
 		{"Installing system dependencies", system.InstallDependencies},
 		{"Configuring audio", func() error { return audio.Configure(cfg.ConfigPath) }},
-		// {"Setting up user", user.Setup},
 		{"Setting up application", func() error {
 			return repo.SetupApp(cfg.AppDir, fmt.Sprintf("https://%s:%s@github.com/%s/%s.git", cfg.RepoUser, cfg.RepoToken, cfg.RepoOrg, cfg.RepoName))
 		}},
