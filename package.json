@@ -2,7 +2,9 @@
   "name": "AudeticLinkInstaller",
   "version": "0.0.5",
   "private": true,
+  "type": "module",
   "scripts": {
+    "test": "go test ./...",
     "prepare": "husky"
   },
   "devDependencies": {
