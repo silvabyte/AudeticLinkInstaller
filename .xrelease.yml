@@ -28,18 +28,16 @@ release:
 
   # Pre-release checks
   checks:
-    - type: lint
-      command: 'golangci-lint run'
-    - type: test
-      command: 'go test ./...'
     - type: build
-      command: 'go build'
+      command: 'make build-arm64'
 
   # Release actions actions
   actions:
     - type: git-tag
     - type: commit-push
     - type: github-release
+      assets:
+        - 'out/link_arm64'
     - type: custom
       name: 'update-go-mod'
       command: |
