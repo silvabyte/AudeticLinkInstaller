@@ -9,15 +9,14 @@ import (
 	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
 )
 
-const alsaConfig = `pcm.i2s_mic {
+const alsaConfig = `pcm.!default {
     type hw
-    card sndrpii2scard
-    device 0
+    card 0
 }
 
-pcm.!default {
-    type plug
-    slave.pcm "i2s_mic"
+ctl.!default {
+    type hw
+    card 0
 }`
 
 // Configure sets up I2S audio on the Raspberry Pi
@@ -27,14 +26,28 @@ func Configure(cfg *types.RPiConfig) error {
 	}
 
 	// Enable I2S in config.txt
-	cfg.Progress.UpdateMessage("Enabling I2S in config.txt...")
+	// 	dtparam=i2s=on
+	// dtoverlay=i2s-mmap
+	// dtoverlay=rpi-i2s-mmap
+	// dtoverlay=googlevoicehat-soundcard
+	cfg.Progress.UpdateMessage("Enabling dtparam=i2s=on")
 	if err := appendIfNotExists(cfg.ConfigPath, "dtparam=i2s=on"); err != nil {
 		return fmt.Errorf("failed to enable I2S: %w", err)
 	}
 
 	// Add I2S mic overlay
-	cfg.Progress.UpdateMessage("Adding I2S mic overlay...")
+	cfg.Progress.UpdateMessage("Adding dtoverlay=i2s-mmap")
 	if err := appendIfNotExists(cfg.ConfigPath, "dtoverlay=i2s-mmap"); err != nil {
+		return fmt.Errorf("failed to add I2S overlay: %w", err)
+	}
+
+	cfg.Progress.UpdateMessage("Adding dtoverlay=rpi-i2s-mmap")
+	if err := appendIfNotExists(cfg.ConfigPath, "dtoverlay=rpi-i2s-mmap"); err != nil {
+		return fmt.Errorf("failed to add I2S overlay: %w", err)
+	}
+
+	cfg.Progress.UpdateMessage("Adding dtoverlay=googlevoicehat-soundcard")
+	if err := appendIfNotExists(cfg.ConfigPath, "dtoverlay=googlevoicehat-soundcard"); err != nil {
 		return fmt.Errorf("failed to add I2S overlay: %w", err)
 	}
 
@@ -59,7 +72,22 @@ func appendIfNotExists(path, line string) error {
 		return err
 	}
 
-	if !strings.Contains(string(content), line) {
+	// Split content into lines and check each uncommented line
+	lines := strings.Split(string(content), "\n")
+	exists := false
+	for _, existingLine := range lines {
+		trimmed := strings.TrimSpace(existingLine)
+		// Skip empty lines and comments
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		if trimmed == strings.TrimSpace(line) {
+			exists = true
+			break
+		}
+	}
+
+	if !exists {
 		f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
 			return err

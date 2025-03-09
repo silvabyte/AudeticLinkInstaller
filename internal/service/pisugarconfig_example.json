@@ -1,0 +1,15 @@
+{
+    "i2c_bus": 1,
+    "double_tap_enable": true,
+    "double_tap_shell": "curl -X POST http://0.0.0.0:8481/record/toggle",
+    "auto_shutdown_level": 5,
+    "auto_shutdown_delay": 30,
+    "auto_charging_range": [
+        70,
+        95
+    ],
+    "full_charge_duration": 110,
+    "auto_power_on": true,
+    "soft_poweroff": true,
+    "auto_rtc_sync": true
+}

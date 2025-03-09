@@ -76,6 +76,13 @@ func Setup(cfg *types.RPiConfig) error {
 		return nil
 	}
 
+	// enable i2c via sudo raspi-config nonint do_i2c 0
+	cfg.Progress.UpdateMessage("Enabling I2C...")
+	cmd := exec.Command("raspi-config", "nonint", "do_i2c", "0")
+	if err := execWithLogging(cmd); err != nil {
+		return fmt.Errorf("failed to enable i2c: %w", err)
+	}
+
 	// Copy service file
 	cfg.Progress.UpdateMessage("Creating service file...")
 	contents, err := createServiceFileContents(cfg.AppDir)
@@ -105,7 +112,7 @@ func Setup(cfg *types.RPiConfig) error {
 	}
 
 	// Recursively set ownership of all files
-	cmd := exec.Command("chown", "-R", fmt.Sprintf("%s:", realUser.Username), cfg.AppDir)
+	cmd = exec.Command("chown", "-R", fmt.Sprintf("%s:", realUser.Username), cfg.AppDir)
 	if err := execWithLogging(cmd); err != nil {
 		return fmt.Errorf("failed to set recursive ownership: %w", err)
 	}

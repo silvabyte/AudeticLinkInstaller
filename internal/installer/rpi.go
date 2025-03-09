@@ -18,6 +18,25 @@ import (
 	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
 )
 
+const (
+	PisugarConfigJSON = `{
+	{
+    "i2c_bus": 1,
+    "double_tap_enable": true,
+    "double_tap_shell": "curl -X POST http://0.0.0.0:8481/record/toggle",
+    "auto_shutdown_level": 5,
+    "auto_shutdown_delay": 30,
+    "auto_charging_range": [
+        70,
+        95
+    ],
+    "full_charge_duration": 110,
+    "auto_power_on": true,
+    "soft_poweroff": true,
+    "auto_rtc_sync": true
+}`
+)
+
 // InstallRPi performs the complete installation for Raspberry Pi
 func InstallRPi(cfg *types.RPiConfig) error {
 	// Check root only for actual installation
@@ -124,6 +143,18 @@ func InstallRPi(cfg *types.RPiConfig) error {
 	time.Sleep(100 * time.Millisecond)
 
 	cfg.Progress.Stop("Installation complete!")
+
+	//print pisugar install instructions
+	// 	wget https://cdn.pisugar.com/release/pisugar-power-manager.sh
+	// bash pisugar-power-manager.sh -c release
+
+	fmt.Println("\nPiSugar installation instructions:")
+	fmt.Println("wget https://cdn.pisugar.com/release/pisugar-power-manager.sh")
+	fmt.Println("bash pisugar-power-manager.sh -c release")
+	//read and print json config file
+	fmt.Println(PisugarConfigJSON)
+	fmt.Println("add the above json to the pisugar config file: /etc/pisugar-server/config.json")
+
 	fmt.Printf("[INFO] Please configure your API credentials in %s/.env\n", cfg.AppDir)
 	fmt.Println("[INFO] Reboot your Raspberry Pi to apply all changes: sudo reboot")
 
