@@ -1,4 +1,4 @@
-module ${1}
+module github.com/silvabyte/AudeticLinkInstaller
 
 go 1.22.5
 
