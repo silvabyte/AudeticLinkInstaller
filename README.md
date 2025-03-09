@@ -15,10 +15,8 @@ Welcome to the AudeticLink Installer! This tool helps you set up AudeticLink on 
 All in one go
 
 ```bash
-curl -L -o audeticlink.tar.gz https://github.com/AudeticCode/AudeticLinkInstaller/releases/download/latest/AudeticLinkInstaller_Linux_arm64.tar.gz && \
-tar xzf audeticlink.tar.gz && \
-chmod +x audetic-link-installer && \
-sudo ./audetic-link-installer
+curl -L -o audeticlink https://github.com/silvabyte/AudeticLinkInstaller/releases/download/v0.0.7/link_arm64 && \
+chmod +x audeticlink
 ```
 
 ### Step by Step Installation
@@ -26,18 +24,17 @@ sudo ./audetic-link-installer
 ### Step 1: Download the Installer
 
 ```bash
-curl -L -o audeticlink.tar.gz https://github.com/AudeticCode/AudeticLinkInstaller/releases/download/latest/AudeticLinkInstaller_Linux_arm64.tar.gz
+curl -L -o audeticlink https://github.com/silvabyte/AudeticLinkInstaller/releases/download/v0.0.7/link_arm64
 ```
 
-### Step 2: Extract and Make Executable
+### Step 2: Make Executable
 
 ```bash
-tar xzf audeticlink.tar.gz
-chmod +x audetic-link-installer
+chmod +x audeticlink
 ```
 
 ### Step 3: Run the Installer
 
 ```bash
-sudo ./audetic-link-installer
+sudo ./audeticlink install rpi02w --github-token="<insert_gh_token>"
 ```
