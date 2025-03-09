@@ -8,6 +8,8 @@
 *.so
 *.dylib
 
+audeticlink
+
 out
 
 # Test binary, built with `go test -c`
@@ -27,3 +29,5 @@ go.work.sum
 .env
 # Added by goreleaser init:
 dist/
+
+node_modules
