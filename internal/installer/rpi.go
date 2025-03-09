@@ -125,7 +125,7 @@ func InstallRPi(cfg *types.RPiConfig) error {
 
 	cfg.Progress.Stop("Installation complete!")
 	fmt.Printf("[INFO] Please configure your API credentials in %s/.env\n", cfg.AppDir)
-	fmt.Println("[INFO] Reboot your Raspberry Pi to apply all changes")
+	fmt.Println("[INFO] Reboot your Raspberry Pi to apply all changes: sudo reboot")
 
 	return nil
 }

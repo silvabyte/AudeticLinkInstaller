@@ -5,10 +5,43 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/silvabyte/AudeticLinkInstaller/internal/types"
 	"github.com/silvabyte/AudeticLinkInstaller/internal/user_utils"
 )
+
+// execWithLogging executes a command and logs output to a file
+func execWithLogging(cmd *exec.Cmd) error {
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+
+	// Write outputs to log file
+	logPath := "audetic_link_debug.log"
+	logContent := fmt.Sprintf("\n=== Command: %v ===\nTimestamp: %s\n\nStdout:\n%s\n\nStderr:\n%s\n\n",
+		cmd.Args, time.Now().Format(time.RFC3339), stdout.String(), stderr.String())
+
+	// Open file in append mode or create if doesn't exist
+	f, openErr := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if openErr != nil {
+		return fmt.Errorf("failed to open log file: %w", openErr)
+	}
+	defer f.Close()
+
+	if _, writeErr := f.WriteString(logContent); writeErr != nil {
+		return fmt.Errorf("failed to write to log file: %w", writeErr)
+	}
+
+	if err != nil {
+		return fmt.Errorf("%w\nCheck %s for details", err, logPath)
+	}
+
+	// Don't remove the log file since we want to keep the history
+	return nil
+}
 
 func createServiceFileContents(appDir string) (string, error) {
 	realUser, err := user_utils.GetRealUser()
@@ -72,24 +105,28 @@ func Setup(cfg *types.RPiConfig) error {
 	}
 
 	// Recursively set ownership of all files
-	if err := exec.Command("chown", "-R", fmt.Sprintf("%s:", realUser.Username), cfg.AppDir).Run(); err != nil {
+	cmd := exec.Command("chown", "-R", fmt.Sprintf("%s:", realUser.Username), cfg.AppDir)
+	if err := execWithLogging(cmd); err != nil {
 		return fmt.Errorf("failed to set recursive ownership: %w", err)
 	}
 
 	// Reload systemd
 	cfg.Progress.UpdateMessage("Reloading systemd...")
-	if err := exec.Command("systemctl", "daemon-reload").Run(); err != nil {
+	cmd = exec.Command("systemctl", "daemon-reload")
+	if err := execWithLogging(cmd); err != nil {
 		return fmt.Errorf("failed to reload systemd: %w", err)
 	}
 
 	// Enable and start service
 	cfg.Progress.UpdateMessage("Enabling service...")
-	if err := exec.Command("systemctl", "enable", "audetic_link.service").Run(); err != nil {
+	cmd = exec.Command("systemctl", "enable", "audetic_link.service")
+	if err := execWithLogging(cmd); err != nil {
 		return fmt.Errorf("failed to enable service: %w", err)
 	}
 
 	cfg.Progress.UpdateMessage("Starting service...")
-	if err := exec.Command("systemctl", "start", "audetic_link.service").Run(); err != nil {
+	cmd = exec.Command("systemctl", "start", "audetic_link.service")
+	if err := execWithLogging(cmd); err != nil {
 		return fmt.Errorf("failed to start service: %w", err)
 	}
 
@@ -102,54 +139,17 @@ func SetupRemoteAccess(cfg *types.RPiConfig) error {
 		return nil
 	}
 
-	realUser, err := user_utils.GetRealUser()
-	if err != nil {
-		return fmt.Errorf("failed to get real user: %w", err)
-	}
-
 	// Enable and start rpi-connect
 	cfg.Progress.UpdateMessage("Enabling rpi-connect...")
-	cmd := exec.Command("systemctl", "enable", "rpi-connect")
-	if cfg.Debug {
-		var stderr bytes.Buffer
-		cmd.Stderr = &stderr
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to enable rpi-connect: %w\nError output: %s", err, stderr.String())
-		}
-	} else {
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to enable rpi-connect: %w", err)
-		}
+	cmd := exec.Command("rpi-connect", "on")
+	if err := execWithLogging(cmd); err != nil {
+		return fmt.Errorf("failed to enable rpi-connect: %w", err)
 	}
 
-	cfg.Progress.UpdateMessage("Starting rpi-connect...")
-	cmd = exec.Command("systemctl", "start", "rpi-connect")
-	if cfg.Debug {
-		var stderr bytes.Buffer
-		cmd.Stderr = &stderr
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to start rpi-connect: %w\nError output: %s", err, stderr.String())
-		}
-	} else {
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to start rpi-connect: %w", err)
-		}
-	}
+	fmt.Println("[INFO] rpi-connect is on, run the following command fully step:")
 
-	// Enable user lingering
-	cfg.Progress.UpdateMessage("Enabling user lingering...")
-	cmd = exec.Command("loginctl", "enable-linger", realUser.Username)
-	if cfg.Debug {
-		var stderr bytes.Buffer
-		cmd.Stderr = &stderr
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to enable user lingering: %w\nError output: %s", err, stderr.String())
-		}
-	} else {
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to enable user lingering: %w", err)
-		}
-	}
+	fmt.Println("rpi-connect signin")
+	fmt.Println("loginctl enable-linger")
 
 	return nil
 }
