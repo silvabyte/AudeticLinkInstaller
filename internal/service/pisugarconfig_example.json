@@ -1,8 +1,18 @@
 {
+    "auth_user": "admin",
+    "auth_password": "something_really_hard",
+    "session_timeout": 3600,
     "i2c_bus": 1,
+    "i2c_addr": null,
+    "auto_wake_time": null,
+    "auto_wake_repeat": 0,
+    "single_tap_enable": false,
+    "single_tap_shell": "",
     "double_tap_enable": true,
     "double_tap_shell": "curl -X POST http://0.0.0.0:8481/record/toggle",
-    "auto_shutdown_level": 5,
+    "long_tap_enable": false,
+    "long_tap_shell": "",
+    "auto_shutdown_level": 7,
     "auto_shutdown_delay": 30,
     "auto_charging_range": [
         70,
@@ -10,6 +20,13 @@
     ],
     "full_charge_duration": 110,
     "auto_power_on": true,
-    "soft_poweroff": true,
-    "auto_rtc_sync": true
+    "soft_poweroff": null,
+    "soft_poweroff_shell": null,
+    "auto_rtc_sync": true,
+    "adj_comm": null,
+    "adj_diff": null,
+    "rtc_adj_ppm": null,
+    "anti_mistouch": null,
+    "bat_protect": null,
+    "battery_curve": null
 }
