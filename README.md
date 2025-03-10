@@ -1,4 +1,5 @@
 # AudeticLink Installer
+[![Release: Automated with xrelease](https://img.shields.io/badge/Release-Automated%20with%20xrelease-blueviolet?logo=github&logoColor=white)](https://github.com/matsilva/xrelease)
 
 Welcome to the AudeticLink Installer! This tool helps you set up AudeticLink on your raspberry pi. Follow the steps below to download and run the installer.
 
