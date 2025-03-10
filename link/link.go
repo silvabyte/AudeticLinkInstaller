@@ -16,8 +16,10 @@ type InstallCmd struct {
 }
 
 type LinkInstaller struct {
-	Install     InstallCmd `cmd:"" help:"Install Audetic Link on a device"`
-	GithubToken string     `help:"GitHub personal access token for repository access" required:"" env:"GITHUB_TOKEN"`
+	Install      InstallCmd `cmd:"" help:"Install Audetic Link on a device"`
+	GithubToken  string     `help:"GitHub personal access token for repository access" required:"" env:"GITHUB_TOKEN"`
+	ClientID     string     `help:"Audetic API Client ID for OAuth2 authentication" optional:"" env:"CLIENT_ID"`
+	ClientSecret string     `help:"Audetic API Client Secret for OAuth2 authentication" optional:"" env:"CLIENT_SECRET"`
 }
 
 // InstallRPi02W installs Audetic Link for Raspberry Pi Zero 2 W
@@ -36,14 +38,16 @@ func InstallRPi02W(cmd *LinkInstaller) error {
 	}
 
 	cfg := &types.RPiConfig{
-		ConfigPath: "/boot/firmware/config.txt",
-		AppDir:     fmt.Sprintf("%s/AudeticLink", home),
-		RepoUser:   "matsilva",
-		RepoToken:  cmd.GithubToken,
-		RepoOrg:    "silvabyte",
-		RepoName:   "AudeticLink",
-		DryRun:     cmd.Install.DryRun,
-		Debug:      cmd.Install.Debug,
+		ConfigPath:   "/boot/firmware/config.txt",
+		AppDir:       fmt.Sprintf("%s/AudeticLink", home),
+		RepoUser:     "matsilva",
+		RepoToken:    cmd.GithubToken,
+		RepoOrg:      "silvabyte",
+		RepoName:     "AudeticLink",
+		ClientID:     cmd.ClientID,
+		ClientSecret: cmd.ClientSecret,
+		DryRun:       cmd.Install.DryRun,
+		Debug:        cmd.Install.Debug,
 	}
 
 	if err := installer.InstallRPi(cfg); err != nil {

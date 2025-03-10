@@ -10,7 +10,7 @@ import (
 )
 
 const envTemplate = `APP_DIR=%s
-AUDETIC_API_URL=https://app.audetic.ai`
+AUDETIC_API_URL=https://app.audetic.ai%s%s`
 
 // SetupEnv creates and configures the .env file
 func SetupEnv(cfg *types.RPiConfig) error {
@@ -20,7 +20,17 @@ func SetupEnv(cfg *types.RPiConfig) error {
 
 	cfg.Progress.UpdateMessage("Creating .env file...")
 	envPath := filepath.Join(cfg.AppDir, ".env")
-	content := fmt.Sprintf(envTemplate, cfg.AppDir)
+
+	// Prepare optional environment variables
+	var clientIDEnv, clientSecretEnv string
+	if cfg.ClientID != "" {
+		clientIDEnv = fmt.Sprintf("\nLINK_CLIENT_ID=%s", cfg.ClientID)
+	}
+	if cfg.ClientSecret != "" {
+		clientSecretEnv = fmt.Sprintf("\nLINK_CLIENT_SECRET=%s", cfg.ClientSecret)
+	}
+
+	content := fmt.Sprintf(envTemplate, cfg.AppDir, clientIDEnv, clientSecretEnv)
 
 	if err := os.WriteFile(envPath, []byte(content), 0600); err != nil {
 		return fmt.Errorf("failed to write .env file: %w", err)
