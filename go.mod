@@ -1,11 +1,10 @@
-module github.com/silvabyte/AudeticLinkInstaller/v0
+module github.com/silvabyte/AudeticLinkInstaller
 
 go 1.22.5
 
 require (
 	github.com/alecthomas/kong v1.8.1
 	github.com/fatih/color v1.16.0
-	github.com/silvabyte/AudeticLinkInstaller v0.0.7
 )
 
 require (
